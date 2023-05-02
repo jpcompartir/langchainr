@@ -1,5 +1,56 @@
-# Load the R6 package for creating classes
-library(R6)
+#' R6 Class representing a Base Language Model
+#'
+#' A BaseLLM provides a simple language model implementation with cache, verbosity, and callback manager functionality.
+#'
+#' @seealso \code{\link{OtherLanguageModels}}
+#' @export
+#' @family Language Models
+BaseLLM <- R6::R6Class("BaseLLM",
+                       public = list(
+                         #' @field cache A list to store cached data.
+                         cache = list(),
+
+                         #' @field verbose A boolean flag to control verbosity.
+                         verbose = NULL,
+
+                         #' @description
+                         #' Create a new BaseLLM object.
+                         #' @param cache A list to store cached data (default: empty list).
+                         #' @param verbose A boolean flag to control verbosity (default: FALSE).
+                         #' @param callback_manager A function to handle events and callbacks (default: NULL).
+                         #' @return A new `BaseLLM` object.
+                         initialize = function(cache = list(), verbose = FALSE, callback_manager = NULL) {
+                           self$cache <- cache
+                           self$verbose <- verbose
+
+                           if (is.null(callback_manager)) {
+                             private$callback_manager <- function(event, ...) {
+                               return(list(event = event, ...))
+                             }
+                           } else {
+                             private$callback_manager <- callback_manager
+                           }
+                         },
+
+                         #' @description
+                         #' Return the verbosity flag of the instance.
+                         #' @return A boolean indicating if verbosity is enabled.
+                         #' @examples
+                         #' # Create a new BaseLLM instance
+                         #' lm <- BaseLLM$new()
+                         #' # Check the verbosity
+                         #' lm$get_verbosity()
+                         get_verbosity = function() {
+                           return(self$verbose)
+                         }
+                       ),
+
+                       private = list(
+                         callback_manager = NULL
+                       )
+)
+
+
 
 # Explanation of the BaseLLM R6 Class
 # -----------------------------------
@@ -18,29 +69,4 @@ library(R6)
 #
 # 5. 'get_verbosity()' is a public method to return the value of the 'verbose' property.
 
-
-# Define the BaseLLM class using R6
-BaseLLM <- R6::R6Class("BaseLLM",
-                       public = list(
-                         cache = NULL,
-                         verbose = NULL,
-                         callback_manager = NULL,
-                         initialize = function(cache = list(), verbose = FALSE, callback_manager = NULL) {
-                           self$cache <- cache
-                           self$verbose <- verbose
-
-                           if (is.null(callback_manager)) {
-                             self$callback_manager <- function(event, ...) {
-                               return(list(event = event, ...))
-                             }
-                           } else {
-                             self$callback_manager <- callback_manager
-                           }
-                         },
-
-                         get_verbosity = function() {
-                           return(self$verbose)
-                         }
-                       )
-)
 
